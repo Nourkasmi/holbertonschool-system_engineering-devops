@@ -1,0 +1,51 @@
+User → www.foobar.com → IP 8.8.8.8 → Server
+
+One Server Web Infrastructure
+
+1. Scenario:
+A user opens a browser and types "www.foobar.com". This request is sent over the internet to retrieve a webpage.
+
+2. Domain Name:
+- foobar.com is the domain name.
+- www.foobar.com is a subdomain.
+- A DNS record of type A or CNAME is used.
+- It points to the IP address 8.8.8.8, which is the server hosting the website.
+
+3. Server:
+- A server is a computer that provides resources, data, services, or programs to other computers (clients).
+- This server has IP address 8.8.8.8 and contains:
+
+   a. **Web Server (Nginx)**:
+      - Handles incoming HTTP/HTTPS requests.
+      - Serves static files (HTML, CSS, JS).
+      - Forwards dynamic requests to the application server.
+
+   b. **Application Server (e.g., PHP-FPM)**:
+      - Executes backend code (e.g., PHP files).
+      - Processes logic and sends results to the web server.
+
+   c. **Application Files**:
+      - Codebase for the website (HTML, PHP, JavaScript, etc.).
+
+   d. **Database (MySQL)**:
+      - Stores and manages data.
+      - Responds to SQL queries from the application server.
+
+4. Communication:
+- The server and user’s browser communicate using the **HTTP** protocol over **TCP/IP**.
+
+5. DNS Record:
+- The `www` part in www.foobar.com is a **CNAME** or **A record**.
+- Most often, `www` is a **CNAME** pointing to `foobar.com`, which is an A record pointing to `8.8.8.8`.
+
+6. Problems with This Infrastructure:
+- **Single Point of Failure (SPOF)**:
+  If the server crashes, the whole website is unavailable.
+  
+- **Maintenance Downtime**:
+  Restarting the server or web service for updates will cause temporary outage.
+  
+- **Scalability Issues**:
+  The server can't handle a large number of requests or high traffic spikes.
+  No load balancing or redundancy.
+

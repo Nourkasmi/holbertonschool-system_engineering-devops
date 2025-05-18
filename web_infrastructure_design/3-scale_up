@@ -1,0 +1,61 @@
+Scale Up Web Infrastructure – www.foobar.com
+
+Overview:
+This setup is designed to improve scalability, high availability, performance, and modularity. Components of the stack (web server, app server, database) are split across dedicated servers. Two load balancers (configured in a cluster) are used to ensure zero downtime and efficient traffic distribution.
+
+1. Components:
+
+- 1 Domain Name:
+  - www.foobar.com resolves to both load balancers.
+  - DNS or Virtual IP (VIP) used to point to active load balancer.
+
+- 2 Load Balancers (HAProxy):
+  - Act as a cluster (Active-Passive or Active-Active).
+  - Handle incoming HTTP/HTTPS traffic.
+  - Distribute load using Round Robin or Least Connection algorithm.
+  - Ensure fault tolerance — if one fails, the other takes over.
+
+- 1 Web Server:
+  - Runs Nginx.
+  - Serves static content (HTML, CSS, JS).
+  - Forwards dynamic requests to the application server.
+
+- 1 Application Server:
+  - Runs backend logic (e.g., Python, PHP, Node.js).
+  - Processes business logic and handles requests that require computation or database access.
+
+- 1 Database Server (MySQL):
+  - Stores and manages data.
+  - Handles read and write queries from the app server.
+
+2. Why Split Components:
+
+- **Web Server (Nginx)**:
+  - Specialized for serving static files and handling HTTP requests.
+  - Offloads requests from the application layer, improving performance.
+
+- **Application Server**:
+  - Runs backend logic separately, making it scalable independently of the web server.
+  - Improves modularity, security, and ease of maintenance.
+
+- **Database Server**:
+  - Dedicated server improves database performance and isolates sensitive data storage.
+
+- **Second Load Balancer (HAProxy)**:
+  - Ensures high availability.
+  - Eliminates single point of failure at the entry point.
+
+3. Benefits of Scaling Up:
+
+- Better **modularity**: Each component can be scaled or updated independently.
+- Improved **security**: Isolating database reduces attack surface.
+- Higher **availability**: Redundant load balancers reduce downtime.
+- Enhanced **performance**: Each layer focuses on what it does best (web, app, DB).
+
+4. Infrastructure Summary:
+
+User → DNS (www.foobar.com) → Load Balancer Cluster (HAProxy x2)  
+→ Web Server (Nginx)  
+→ Application Server  
+→ MySQL Database
+

@@ -1,0 +1,88 @@
+Secured and Monitored Web Infrastructure – www.foobar.com
+
+Overview:
+A secure and monitored web infrastructure that serves encrypted traffic via HTTPS and is protected by firewalls. The infrastructure consists of a load balancer, two application servers (each with Nginx, application server, and a MySQL replica), and one MySQL primary database server. Each server is monitored and protected.
+
+1. Components:
+
+- 1 Domain Name (foobar.com)
+  - www.foobar.com points to Load Balancer IP using DNS A or CNAME record.
+  - Configured with an SSL certificate to serve secure HTTPS traffic.
+
+- 1 Load Balancer (HAProxy):
+  - Handles all incoming HTTPS requests (port 443).
+  - Terminates SSL connections.
+  - Forwards decrypted traffic to backend servers using internal HTTP.
+  - Uses Round Robin to distribute load.
+
+- 2 Backend Servers:
+  Each contains:
+    - Web Server (Nginx)
+    - Application Server
+    - Application Files (code base)
+    - MySQL Replica (for read-only)
+
+- 1 Primary MySQL Server:
+  - Accepts write queries.
+  - Replicates data to replicas on backend servers.
+
+- 3 Firewalls:
+  - One for the Load Balancer: allows only ports 80 (HTTP), 443 (HTTPS), and monitoring traffic.
+  - One for each backend server: only allows incoming connections from the Load Balancer and from the MySQL primary for replication.
+
+- SSL Certificate:
+  - Installed on Load Balancer.
+  - Encrypts all user-server communication over HTTPS.
+  - Protects against MITM (Man-In-The-Middle) attacks.
+
+- 3 Monitoring Clients:
+  - Installed on Load Balancer and both backend servers.
+  - Collect data such as CPU usage, memory, QPS, disk I/O.
+  - Forward logs and metrics to a monitoring service (e.g., Sumo Logic, Prometheus, Datadog).
+
+2. Purpose of Each Security and Monitoring Element:
+
+- **Firewalls**:
+  - Prevent unauthorized access.
+  - Only allow necessary traffic (e.g., HTTPS, database replication).
+  - Add a layer of defense against attacks and exploits.
+
+- **HTTPS with SSL Certificate**:
+  - Encrypts traffic between client and server.
+  - Ensures data privacy, integrity, and security.
+  - Prevents packet sniffing, eavesdropping, and MITM attacks.
+
+- **Monitoring Clients**:
+  - Provide real-time insights into infrastructure health and performance.
+  - Alert in case of errors, high latency, server crashes, etc.
+  - Collect logs, metrics, traces.
+
+- **How Monitoring Tools Collect Data**:
+  - Agents installed on each server gather system metrics, logs, and application data.
+  - Data is sent securely to a centralized dashboard or cloud monitoring service.
+  - Example: Sumo Logic, Datadog, Prometheus + Grafana.
+
+- **Monitoring QPS (Queries Per Second) on Web Server**:
+  - Configure Nginx to log request rate.
+  - Use a monitoring agent to parse and forward logs (e.g., Nginx log files) to the monitoring platform.
+  - Set up a dashboard or alert on spikes in request volume.
+
+3. Issues in This Infrastructure:
+
+- **SSL Termination at Load Balancer**:
+  - SSL is decrypted at the load balancer.
+  - Internal traffic between load balancer and backend servers is unencrypted.
+  - Could be intercepted if internal network is compromised.
+  - Solution: Use SSL passthrough or re-encrypt between LB and backend.
+
+- **Single MySQL Write Server**:
+  - If the primary MySQL server fails, no write operations are possible.
+  - Creates a single point of failure for write operations.
+  - Solution: Use MySQL failover or clustering.
+
+- **All-In-One Server Design (Web, App, DB on each)**:
+  - Increases attack surface and complexity.
+  - Harder to scale individual components.
+  - Waste of resources if components have different performance needs.
+  - Solution: Separate concerns — run DB, app, and web servers on dedicated VMs or containers.
+

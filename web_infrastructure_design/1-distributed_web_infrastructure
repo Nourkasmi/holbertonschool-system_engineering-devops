@@ -1,0 +1,73 @@
+User → www.foobar.com → DNS resolves to Load Balancer → Forwards to one of 2 servers → Servers handle request
+
+Distributed Web Infrastructure (3 servers)
+
+1. Components:
+
+- 1 Domain Name:
+  - foobar.com with a `www` CNAME or A record pointing to the Load Balancer IP.
+
+- 1 Load Balancer (HAProxy):
+  - Receives all incoming HTTP requests.
+  - Forwards traffic to one of the two backend servers using Round Robin distribution.
+  - Handles high traffic and distributes load to prevent any single server from being overwhelmed.
+
+- 2 Web Servers (Server 1 and Server 2):
+  Each server contains:
+    - Web Server (Nginx): Serves static content and forwards dynamic requests.
+    - Application Server: Executes backend application code.
+    - Application Files: Codebase for the website (PHP, HTML, JS, etc.).
+    - MySQL Database (replicated in Primary-Replica setup).
+
+2. Why Add These Elements:
+
+- **Load Balancer**:
+  - Spreads incoming traffic across multiple servers.
+  - Improves availability and performance.
+  - Enables scalability by supporting more backend servers.
+
+- **Two Backend Servers**:
+  - Avoids Single Point of Failure (SPOF).
+  - Ensures redundancy – if one fails, the other can serve requests.
+  - Allows horizontal scaling for better performance.
+
+- **Database Replication (Primary-Replica)**:
+  - Ensures data availability and redundancy.
+  - Distributes read operations to Replica to reduce load on Primary.
+
+3. Load Balancer Configuration:
+
+- **Algorithm**: Round Robin
+  - Each incoming request is sent to the next available backend server in order.
+  - Ensures equal load distribution.
+  
+- **Active-Active Setup**:
+  - Both servers are active and handle requests simultaneously.
+  - This contrasts with Active-Passive, where only one server handles requests and the other remains on standby.
+
+4. Primary-Replica Database Cluster:
+
+- The **Primary (Master)** node:
+  - Handles all **write** operations (INSERT, UPDATE, DELETE).
+  
+- The **Replica (Slave)** node:
+  - Handles **read-only** operations (SELECT).
+  - Automatically replicates data from the Primary in near real-time.
+  
+- The application connects:
+  - To the Primary DB for write queries.
+  - To the Replica DB for read queries (if configured).
+
+5. Issues in This Infrastructure:
+
+- **Single Point of Failure (SPOF)**:
+  - The Load Balancer is a SPOF — if it goes down, the entire infrastructure becomes unreachable.
+
+- **Security Issues**:
+  - No HTTPS (data in plaintext, vulnerable to MITM attacks).
+  - No firewall or IP filtering (system is open to unauthorized access).
+
+- **No Monitoring**:
+  - No visibility into server health, load, or failures.
+  - Makes it difficult to respond to performance degradation or outages.
+
